@@ -402,7 +402,7 @@ def handle_firewalls(tabadmin_path, gateway_port, options):
 
 # Run a command. If the exit code isn't zero, it'll throw an exception.
 # If exit code is zero, return the output from running the command.
-def run_command(binary_path, arguments, show_args=True):
+def run_command(binary_path, arguments, show_args=True, fail_on_error=True):
     if not os.path.isfile(binary_path):
         raise MissingExecutableError('The executable file %s does not exist' % binary_path)
     print("Running: " + str(binary_path) + str(arguments if show_args else ''))
@@ -411,7 +411,8 @@ def run_command(binary_path, arguments, show_args=True):
         return output
     except subprocess.CalledProcessError as ex:
         print_error("Failed with output %s" % ex.output)
-        raise ExitCodeError(binary_path, ex.returncode)
+        if fail_on_error:
+            raise ExitCodeError(binary_path, ex.returncode)
 
 # Install the server; run installer, install services, activate, register, open firewall ports, whatever.
 def run_install(options, secrets):
@@ -450,7 +451,7 @@ def run_install(options, secrets):
     # If they're using the 'trial' option, activate with that. Otherwise, use the license key given on the cmdline
     if options.trial:
         print('Activating product using trial option')
-        run_command(tabadmin_path, ['activate', '--trial'])
+        run_command(tabadmin_path, ['activate', '--trial'], fail_on_error=False)
     else:
         print('Activating product')
         run_command(tabadmin_path, ['activate', '--key', options.licenseKey])

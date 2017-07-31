@@ -8,6 +8,7 @@ import tempfile
 import json
 import shutil
 import yaml
+import time
 
 # If one of the entries in KNOWN_GOOD_PYTHON_VERSIONS matches a prefix if the current version, we're good.
 # That is to say, 2.7 matches 2.7.x where x is anything. 2.8.1 only would match 2.8.1, and so on.
@@ -463,6 +464,10 @@ def run_install(options, secrets):
     print('Server is starting')
     run_command(tabadmin_path, ['start'])
 
+    # Sleep a bit for good measure
+    print('Server starting, sleep a minute...')
+    time.sleep(60)
+    
     # Register our initial user
     print('Server is installed and running')
     gateway_port = get_config_parameter(options, tabadmin_path, 'worker0.gateway.port') or '80'
